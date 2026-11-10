@@ -76,15 +76,14 @@ body.has-results{overflow:hidden}
 <header><div><h1>POLÍTICA ECONÓMICA</h1><small id="gameSubtitle">Configuración</small></div><div class="row"><span id="clock" class="pill">Configuración</span><button id="pause" disabled>Pausar</button><button id="reset">Nueva partida</button><button id="viewResults" hidden>Ver resultados</button></div></header>
 <section class="setup-screen" id="setupScreen" aria-label="Configuración de partida"><div class="setup-panel">
 <div class="pill" style="display:inline-block;margin-bottom:14px">Fase 1 de 3 · Configuración</div>
-<h2>Prepara tu mandato</h2><p class="explain">Elige la autoridad que controlarás, si adoptarás la regla fiscal y cuánto dura cada mes. Después dispondrás del <strong>tiempo de diagnóstico que selecciones</strong> para examinar una economía con 12 meses de historia aleatoria. Durante ese diagnóstico los instrumentos estarán bloqueados y, al acabar, el juego comenzará automáticamente.</p>
+<h2>Prepara tu mandato</h2>
 <div class="setup-field"><label for="role">Papel institucional</label><select id="role"><option value="gov">Gobierno</option><option value="cb">Banco Central</option></select></div>
 <div class="setup-field"><label for="fiscalRule">Techo de deuda del 70 % del PIB</label><select id="fiscalRule"><option value="on">Con regla fiscal (afecta la evaluación electoral)</option><option value="off">Sin regla fiscal (solo referencia informativa)</option></select></div>
-<div class="setup-field"><label for="periodSeconds">Segundos por mes económico</label><div class="setup-slider-head"><output id="periodSecondsValue" for="periodSeconds">3 segundos</output><span>1–15 segundos</span></div><input type="range" id="periodSeconds" min="1" max="15" step="1" value="3" aria-label="Duración de cada mes en segundos"/><div class="setup-slider-head"><span>1 segundo</span><span>15 segundos</span></div><p>La duración del mes económico es independiente del tiempo de diagnóstico.</p></div>
+<div class="setup-field"><label for="periodSeconds">Segundos por mes económico</label><div class="setup-slider-head"><output id="periodSecondsValue" for="periodSeconds">3 segundos</output><span>1–15 segundos</span></div><input type="range" id="periodSeconds" min="1" max="15" step="1" value="3" aria-label="Duración de cada mes en segundos"/><div class="setup-slider-head"><span>1 segundo</span><span>15 segundos</span></div></div>
 <div class="setup-field"><label for="previewSeconds">Tiempo para examinar las condiciones iniciales</label>
 <div class="setup-slider-head"><output id="previewSecondsValue" for="previewSeconds">30 segundos</output><span>30–145 segundos</span></div>
 <input type="range" id="previewSeconds" min="30" max="145" step="1" value="30" aria-label="Tiempo de diagnóstico en segundos"/>
-<div class="setup-slider-head"><span>30 segundos</span><span>145 segundos</span></div>
-<p>Durante este período los indicadores y los 12 meses históricos están visibles, pero no puedes cambiar los instrumentos. La partida comienza automáticamente al terminar.</p></div>
+<div class="setup-slider-head"><span>30 segundos</span><span>145 segundos</span></div></div>
 <div class="setup-field"><label for="initialElection">Probabilidad electoral inicial</label><select id="initialElection"><option value="40">40 %</option><option value="45">45 %</option><option value="50">50 %</option><option value="55">55 %</option></select><p>Es el punto de partida y la referencia neutral del indicador electoral; los resultados del mandato la modifican.</p></div>
 <button id="configure" class="primary">Ver diagnóstico inicial</button></div></section>
 <div class="layout"><main>
