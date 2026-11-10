@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política Económica</title>
+<style>
+:root{color-scheme:dark;--bg:#09111f;--card:#121e31;--card2:#18273b;--line:#293a50;--text:#e9f1fa;--muted:#9bacc2;--blue:#60a5fa;--teal:#2dd4bf;--orange:#fbbf24;--red:#fb7185;--purple:#c4b5fd}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Arial,sans-serif}header{border-bottom:1px solid var(--line);padding:17px max(18px,calc((100vw - 1480px)/2));display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap;background:#0d1829}h1,h2,h3,p{margin:0}h1{font-size:19px;letter-spacing:-.5px}h2{font-size:15px}h3{font-size:13px}small,.muted{color:var(--muted)}button,select{background:#21324b;color:var(--text);border:1px solid #3b526e;border-radius:9px;padding:9px 13px;cursor:pointer;font:inherit}button:hover{background:#294260}button:disabled{opacity:.38;cursor:not-allowed}.primary{background:#0d9488;border-color:#14b8a6;color:white}.primary:hover{background:#0f766e}.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:17px;max-width:1480px;margin:auto;padding:19px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px;min-width:0}.stat .lbl{color:var(--muted);font-size:11px}.stat .val{font-size:25px;font-weight:730;letter-spacing:-.8px;margin-top:8px;font-variant-numeric:tabular-nums;transition:color .18s ease}.stat .val.is-good{color:#34d399}.stat .val.is-bad{color:#fb7185}.stat .val.is-neutral{color:var(--text)}.sub{font-size:11px;color:var(--muted);margin-top:3px}.plots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:13px}.plot{height:242px;display:flex;flex-direction:column;gap:6px}.plot.wide{grid-column:1/-1}.plot canvas{width:100%;height:190px;display:block}.legend{font-size:11px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.controls{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 30px);overflow:auto}.controls .card+.card{margin-top:12px}.control{padding:11px 0;border-bottom:1px solid #24354a}.control:last-child{border:0}.control .r{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px}.control label{font-size:12px}.control strong{font-size:12px;color:var(--teal);white-space:nowrap}input[type=range]{width:100%;accent-color:#2dd4bf;cursor:pointer}.pill{border:1px solid #3f576e;border-radius:100px;padding:4px 10px;font-size:11px;color:var(--muted)}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.between{justify-content:space-between}.explain{color:var(--muted);font-size:12px;line-height:1.55}.log{max-height:185px;overflow:auto;display:flex;flex-direction:column;gap:9px;margin-top:10px}.log div{padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}.log span{color:var(--teal);font-variant-numeric:tabular-nums}.bottom{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:13px}.foot{max-width:1480px;margin:0 auto 35px;padding:0 19px;color:var(--muted);font-size:12px}.mini{display:grid;grid-template-columns:1fr auto;gap:4px 12px;margin-top:9px}.mini span:nth-child(odd){color:var(--muted)}.mini strong{text-align:right}.notice{padding:9px 10px;border:1px solid #354b64;border-radius:8px;margin-top:10px}.end{color:var(--orange);font-weight:700}/* Noticias y composición presupuestal */
+.news-board{margin-top:13px;border-left:3px solid #60a5fa;background:#101e30}
+.news-head{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.news-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:10px}
+.news-item{border:1px solid #33465f;background:#182940;border-radius:10px;padding:12px}
+.news-item.good{border-left:3px solid var(--teal)}.news-item.bad{border-left:3px solid var(--red)}
+.news-item h3{font-size:13px;line-height:1.4;margin:4px 0 7px}.news-item p{font-size:11px;color:var(--muted);margin:0}
+.news-tag{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.news-empty{color:var(--muted);font-size:12px;padding:8px 0}
+.stack-chart{width:100%;height:46px;border-radius:8px;display:flex;overflow:hidden;background:#293a50;margin:13px 0 12px;border:1px solid #354b64}
+.stack-part{height:100%;min-width:0;position:relative;transition:width .25s;box-sizing:border-box;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;color:#091321;text-shadow:0 1px 0 #ffffff35;font-weight:800;font-size:clamp(8px,.95vw,12px);font-variant-numeric:tabular-nums}
+.stack-part .stack-percentage{display:block;line-height:1.1;letter-spacing:-.3px}
+.stack-part.tiny .stack-percentage{font-size:9px;letter-spacing:-.5px}
+.spend-grid{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 22px}
+.spend-row{display:flex;align-items:center;gap:8px;font-size:12px;padding:0}
+.spend-row strong{font-variant-numeric:tabular-nums;white-space:nowrap}
+.spend-label{display:flex;gap:7px;align-items:center}.spend-swatch{width:10px;height:10px;border-radius:2px;display:inline-block;flex:none}
+.spend-foot{font-size:11px;color:var(--muted);margin-top:12px}
+.rule-control{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.rule-control label{font-size:12px;display:block;margin-bottom:7px}
+.shock-pill{border:1px solid var(--line);background:var(--card2);border-radius:10px;padding:10px 12px;min-width:160px;flex:1}.shock-pill .lbl{font-size:11px;color:var(--muted)}.shock-pill .reading{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:4px}.shock-pill .reading.good{color:var(--teal)}.shock-pill .reading.bad{color:var(--red)}.shocks-meta{font-size:12px;color:var(--muted);margin-top:8px}.section-name{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.11em;margin-top:12px}a{color:#93c5fd}
+@media(max-width:1050px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:minmax(0,1fr) 290px}}@media(max-width:780px){.layout{display:flex;flex-direction:column}.controls{position:static;order:-1;max-height:none}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.plots,.bottom{grid-template-columns:1fr}.plot{height:235px}header{padding:14px 18px}.stat .val{font-size:23px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+[hidden]{display:none!important}
+.stage-setup .layout,.stage-setup .foot{display:none}
+.setup-screen{min-height:calc(100vh - 72px);padding:35px 18px 72px;display:flex;align-items:flex-start;justify-content:center}
+.stage-preview .setup-screen,.stage-playing .setup-screen,.stage-paused .setup-screen,.stage-ended .setup-screen{display:none}
+.setup-panel{width:min(100%,650px);border:1px solid #354b64;border-radius:18px;background:var(--card);padding:29px;box-shadow:0 16px 55px #0005}
+.setup-panel h2{font-size:23px;letter-spacing:-.5px;margin-bottom:12px}
+.setup-field{margin:20px 0}.setup-field label{display:block;font-weight:650;margin-bottom:8px;font-size:13px}.setup-field select{width:100%;padding:12px}
+.setup-field p{margin-top:6px;color:var(--muted);font-size:12px}
+.setup-slider-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:6px;color:var(--muted);font-size:12px}.setup-slider-head output{color:var(--teal);font-size:17px;font-weight:730}.setup-field input[type=range]{margin:8px 0 4px;display:block;height:20px;accent-color:var(--teal)}
+.setup-panel button{font-size:15px;padding:13px 17px;width:100%;margin-top:13px}
+.phase-banner{border:1px solid #3c627d;border-left:4px solid var(--teal);background:#123044;border-radius:11px;padding:13px 17px;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.phase-banner strong{font-size:24px;color:var(--teal);font-variant-numeric:tabular-nums}
+.stage-preview .controls input[type=range]{opacity:.45;cursor:not-allowed}
+.stage-preview .controls .card{border-color:#324961}
+.timeline-legend{font-size:11px;color:var(--muted);margin-top:10px}
+@media(max-width:780px){.setup-screen{padding:20px 12px}.setup-panel{padding:20px}}
+/* Noticias económicas: notificaciones temporales sobre el borde inferior. */
+.news-toast-stack{position:fixed;bottom:max(16px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:80;width:min(600px,calc(100vw - 30px));max-height:min(45vh,420px);display:flex;flex-direction:column;gap:10px;overflow-y:auto;scrollbar-width:thin;pointer-events:none}
+.news-toast{background:#152841f2;border:1px solid #48607c;border-left:4px solid var(--blue);border-radius:12px;box-shadow:0 15px 40px #000b;padding:13px 16px;backdrop-filter:blur(12px);pointer-events:auto;animation:toast-entry .36s ease-out both}
+.news-toast.good{border-left-color:var(--teal)}.news-toast.bad{border-left-color:var(--red)}
+.news-toast-head{display:flex;justify-content:space-between;align-items:center;gap:9px;margin-bottom:5px}.news-toast-type{font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.07em;color:#b7cbe0}
+.news-toast h3{font-size:14px;line-height:1.35;margin:0 18px 5px 0}.news-toast p{font-size:12px;color:#c8d5e4;line-height:1.45;margin:0}
+.news-toast button{padding:1px 7px;border:0;background:transparent;color:#bfcee0;font-size:19px;line-height:1.2}.news-toast button:hover{background:#ffffff26;color:#fff}
+.news-toast.expiring{animation:toast-exit .9s ease-in forwards;pointer-events:none}
+@keyframes toast-entry{from{opacity:0;transform:translateY(23px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toast-exit{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(18px)}}
+@media(max-width:780px){.news-toast-stack{max-height:42vh;bottom:max(9px,env(safe-area-inset-bottom))}.news-toast{padding:10px 12px}}
+@media(prefers-reduced-motion:reduce){.news-toast,.news-toast.expiring{animation:none}.news-toast.expiring{opacity:0}}
+
+
+/* Resumen final encima del tablero. */
+body.has-results{overflow:hidden}
+.results-overlay{position:fixed;inset:0;z-index:150;background:rgba(3,9,18,.84);display:flex;justify-content:center;align-items:center;padding:24px 16px;overflow-y:auto;backdrop-filter:blur(6px)}
+.results-panel{background:#152238;border:1px solid #3a536e;box-shadow:0 24px 80px #000b;border-radius:20px;width:min(750px,100%);padding:clamp(20px,3vw,34px);max-height:calc(100vh - 44px);overflow-y:auto}
+.results-heading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.results-heading h2{font-size:clamp(24px,3vw,32px);letter-spacing:-.6px;margin:6px 0 7px}.results-heading p,.results-format{font-size:12px;color:var(--muted)}
+.results-eyebrow{font-size:10px;letter-spacing:.13em;font-weight:800;color:var(--teal)}.results-close{border:1px solid #3c526c;border-radius:9px;font-size:23px;line-height:1;padding:5px 11px;background:#1e3048}
+.results-cards{margin:24px 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.results-card{background:#1c3049;border:1px solid #354c65;border-radius:12px;padding:17px 18px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.results-card span{font-size:12px;color:var(--muted)}.results-card strong{font-size:clamp(24px,3vw,32px);font-variant-numeric:tabular-nums}.results-card strong.is-good{color:#34d399}.results-card strong.is-bad{color:#fb7185}
+.results-election{border-radius:12px;background:#0f2534;border:1px solid #32655b;text-align:center;padding:20px 16px;margin-bottom:19px}.results-election.negative{background:#321c2a;border-color:#744052}.results-election-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#b4c4d6}.results-election-text{font-size:clamp(20px,3vw,28px);font-weight:800;color:#34d399;margin:6px 0}.results-election.negative .results-election-text{color:#fb7185}.results-election p{font-size:12px;color:var(--muted)}
+.results-download{display:block;width:100%;font-size:15px;font-weight:700;padding:14px}.results-new-game{display:block;width:100%;font-size:15px;font-weight:700;padding:13px;margin-top:10px}.results-format{text-align:center;margin-top:9px}
+@media(max-width:560px){.results-overlay{padding:10px}.results-panel{max-height:calc(100vh - 20px);padding:18px}.results-cards{gap:8px}.results-card{padding:13px}.results-card strong{font-size:23px}}
+</style>
+</head>
+<body class="stage-setup">
+<header><div><h1>POLÍTICA ECONÓMICA</h1><small id="gameSubtitle">Configuración</small></div><div class="row"><span id="clock" class="pill">Configuración</span><button id="pause" disabled>Pausar</button><button id="reset">Nueva partida</button><button id="viewResults" hidden>Ver resultados</button></div></header>
+<section class="setup-screen" id="setupScreen" aria-label="Configuración de partida"><div class="setup-panel">
+<div class="pill" style="display:inline-block;margin-bottom:14px">Fase 1 de 3 · Configuración</div>
+<h2>Prepara tu mandato</h2><p class="explain">Elige la autoridad que controlarás, si adoptarás la regla fiscal y cuánto dura cada mes. Después dispondrás del <strong>tiempo de diagnóstico que selecciones</strong> para examinar una economía con 12 meses de historia aleatoria. Durante ese diagnóstico los instrumentos estarán bloqueados y, al acabar, el juego comenzará automáticamente.</p>
+<div class="setup-field"><label for="role">Papel institucional</label><select id="role"><option value="gov">Gobierno</option><option value="cb">Banco Central</option></select></div>
+<div class="setup-field"><label for="fiscalRule">Techo de deuda del 70 % del PIB</label><select id="fiscalRule"><option value="on">Con regla fiscal (afecta la evaluación electoral)</option><option value="off">Sin regla fiscal (solo referencia informativa)</option></select></div>
+<div class="setup-field"><label for="periodSeconds">Segundos por mes económico</label><div class="setup-slider-head"><output id="periodSecondsValue" for="periodSeconds">3 segundos</output><span>1–15 segundos</span></div><input type="range" id="periodSeconds" min="1" max="15" step="1" value="3" aria-label="Duración de cada mes en segundos"/><div class="setup-slider-head"><span>1 segundo</span><span>15 segundos</span></div><p>La duración del mes económico es independiente del tiempo de diagnóstico.</p></div>
+<div class="setup-field"><label for="previewSeconds">Tiempo para examinar las condiciones iniciales</label>
+<div class="setup-slider-head"><output id="previewSecondsValue" for="previewSeconds">30 segundos</output><span>30–145 segundos</span></div>
+<input type="range" id="previewSeconds" min="30" max="145" step="1" value="30" aria-label="Tiempo de diagnóstico en segundos"/>
+<div class="setup-slider-head"><span>30 segundos</span><span>145 segundos</span></div>
+<p>Durante este período los indicadores y los 12 meses históricos están visibles, pero no puedes cambiar los instrumentos. La partida comienza automáticamente al terminar.</p></div>
+<div class="setup-field"><label for="initialElection">Probabilidad electoral inicial</label><select id="initialElection"><option value="40">40 %</option><option value="45">45 %</option><option value="50">50 %</option><option value="55">55 %</option></select><p>Es el punto de partida y la referencia neutral del indicador electoral; los resultados del mandato la modifican.</p></div>
+<button id="configure" class="primary">Ver diagnóstico inicial</button></div></section>
+<div class="layout"><main>
+<section class="phase-banner" id="previewBanner" hidden aria-live="polite"><div><b>Fase 2 de 3 · Diagnóstico de la economía</b><p class="explain">Observa los 12 meses anteriores al mes 0 y los instrumentos heredados. No puedes intervenir todavía; el reloj empezará automáticamente.</p></div><div style="text-align:right"><small>Comienza en</small><br><strong id="previewCountdown">00:30</strong></div></section>
+<div class="stats" aria-label="Indicadores macroeconómicos">
+<div class="card stat"><div class="lbl">Brecha del PIB</div><div class="val is-neutral" id="kGAP">0,0 %</div><div class="sub" id="kGapInfo">Observado frente a potencial</div></div>
+<div class="card stat"><div class="lbl">Inflación interanual</div><div class="val is-neutral" id="kPI">3,0 %</div><div class="sub" id="kInflationTarget">Meta de inflación: 3 %</div></div>
+<div class="card stat"><div class="lbl">Desempleo</div><div class="val is-neutral" id="kU">9,0 %</div><div class="sub" id="kEMP">Empleo: 91,0 %</div></div>
+<div class="card stat"><div class="lbl">Probabilidad de reelección</div><div class="val is-neutral" id="kE">40,0 %</div><div class="sub" id="kEGap">Referencia: probabilidad inicial</div></div>
+<div class="card stat"><div class="lbl">Deuda pública / PIB</div><div class="val is-neutral" id="kB">55,0 %</div><div class="sub" id="kS">Techo de referencia: 70 %</div></div>
+<div class="card stat"><div class="lbl">Déficit primario / PIB</div><div class="val is-neutral" id="kDeficit">1,0 %</div><div class="sub">Positivo = déficit; negativo = superávit</div></div>
+<div class="card stat"><div class="lbl">Deuda vigente a corto plazo</div><div class="val is-neutral" id="kShortStockPct">45,0 %</div><div class="sub" id="kShortStockInfo">Parte del saldo total de deuda</div></div>
+<div class="card stat"><div class="lbl">Tasa de política monetaria</div><div class="val is-neutral" id="kPolicyRate">6,50 %</div><div class="sub">Tasa nominal anual</div></div>
+</div>
+<section class="card" style="margin-top:13px" aria-label="Composición del uso de recursos públicos">
+<div class="row between"><h2>Destino de los recursos públicos</h2><span class="pill">% del total de usos de caja</span></div>
+<div class="stack-chart" id="spendingStack" role="img" aria-label="Composición porcentual del gasto, intereses y amortizaciones"></div>
+<div class="spend-grid" id="spendingLegend"></div>
+
+</section>
+<div class="plots">
+<div class="card plot"><h2>PIB observado y potencial</h2><canvas id="chartY" aria-label="PIB observado y potencial"></canvas><div class="legend"><span><i class="dot" style="background:var(--blue)"></i>Observado</span><span><i class="dot" style="background:var(--teal)"></i>Potencial</span></div></div>
+<div class="card plot"><h2>Crecimiento interanual (%)</h2><canvas id="chartGrowth" aria-label="Crecimiento observado y potencial"></canvas><div class="legend"><span><i class="dot" style="background:var(--blue)"></i>Observado</span><span><i class="dot" style="background:var(--teal)"></i>Potencial</span></div></div>
+<div class="card plot"><h2>Inflación y desempleo (%)</h2><canvas id="chartPrices" aria-label="Inflación y desempleo"></canvas><div class="legend"><span><i class="dot" style="background:var(--orange)"></i>Inflación</span><span><i class="dot" style="background:var(--red)"></i>Desempleo</span></div></div>
+<div class="card plot"><h2>Deuda y reelección (%)</h2><canvas id="chartPolitical" aria-label="Deuda y probabilidad de reelección"></canvas><div class="legend"><span><i class="dot" style="background:var(--blue)"></i>Deuda / PIB</span><span><i class="dot" style="background:var(--orange)"></i>Techo: 70 %</span><span><i class="dot" style="background:var(--teal)"></i>Reelección</span></div></div>
+<div class="card plot"><h2>Ingresos laborales reales (índice)</h2><canvas id="chartIncomes" aria-label="Ingresos reales por ocupado y agregados"></canvas><div class="legend"><span><i class="dot" style="background:var(--teal)"></i>Neto por ocupado</span><span><i class="dot" style="background:var(--purple)"></i>Neto agregado</span></div></div>
+<div class="card plot"><h2>Recaudación por impuesto (% PIB)</h2><canvas id="chartTax" aria-label="Recaudación por impuesto"></canvas><div class="legend"><span><i class="dot" style="background:var(--blue)"></i>Renta personal</span><span><i class="dot" style="background:var(--red)"></i>Empresas</span><span><i class="dot" style="background:var(--orange)"></i>Consumo</span></div></div>
+<div class="card plot wide"><h2>Tasa de interés de política y regla de Taylor (%)</h2><canvas id="chartRate" aria-label="Tasa de política y tasa sugerida por la regla de Taylor"></canvas><div class="legend"><span><i class="dot" style="background:var(--teal)"></i>Tasa efectiva</span><span><i class="dot" style="background:var(--orange)"></i>Tasa Taylor de referencia (modo Gobierno)</span></div></div>
+</div>
+
+</main>
+<aside class="controls"><section class="card"><div class="row between"><h2>Instrumentos de política</h2><span class="pill" id="controlStatus">Bloqueados</span></div><div id="sliders"></div></section></aside></div>
+<section class="results-overlay" id="resultsOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="resultsTitle" aria-describedby="resultsSummary">
+ <div class="results-panel">
+  <div class="results-heading"><div><span class="results-eyebrow">FIN DEL MANDATO · MES 48</span><h2 id="resultsTitle">Juego terminado</h2><p id="resultsSummary">Resultados económicos al cierre del mandato.</p></div><button type="button" id="closeResults" class="results-close" aria-label="Cerrar resumen y ver el tablero">×</button></div>
+  <div class="results-cards" aria-label="Indicadores finales">
+   <div class="results-card"><span>Brecha del PIB</span><strong id="rGAP">—</strong></div>
+   <div class="results-card"><span>Inflación interanual</span><strong id="rPI">—</strong></div>
+   <div class="results-card"><span>Desempleo</span><strong id="rU">—</strong></div>
+   <div class="results-card"><span>Deuda pública / PIB</span><strong id="rB">—</strong></div>
+  </div>
+  <div class="results-election" id="resultsElection" aria-live="polite">
+   <div class="results-election-label">Resultado electoral</div><div class="results-election-text" id="resultsElectionText">—</div><p id="resultsElectionProbability"></p>
+  </div>
+  <button type="button" id="downloadResults" class="primary results-download">Descargar resultados</button>
+  <button type="button" id="newGameFromResults" class="results-new-game">Nueva partida</button>
+ </div>
+</section>
+<div class="news-toast-stack" id="newsToasts" role="region" aria-label="Noticias económicas emergentes" aria-live="polite" aria-relevant="additions" aria-atomic="false"></div>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id), clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+const fmt=(v,n=1)=>Number(v).toLocaleString('es-CO',{minimumFractionDigits:n,maximumFractionDigits:n});
+const pct=(v,n=1)=>fmt(v,n)+' %';
+let previewDurationMs=30000;
+let monthDurationMs=3000;
+const NEWS_POPUP_DURATION_MS=9000;
+const toastTimers=new Set();
+const FISCAL_CEILING=70;
+const SHORT_MATURITY_MONTHS=12, LONG_MATURITY_MONTHS=60;
+const TAYLOR_INFLATION_TARGET=3;
+const TAYLOR_NEUTRAL_REAL_RATE=2.5;
+const TAYLOR_PHI_INFLATION=1.5;
+const TAYLOR_PHI_OUTPUT=0.5;
+const TAYLOR_SPEED=0.45;
+// Rendimiento de la nueva deuda corta: costo marginal de emisión, distinto al cupón
+// promedio de la deuda que ya está vigente. Tasas nominales anuales (%).
+function shortIssueYield(policyRate,debtPct,fiscalRisk){
+ return clamp(policyRate+.25+.025*Math.max(0,debtPct-55)+1.10*fiscalRisk,0,50);
+}
+const defaults={spend:22.5,invest:4.5,transfers:6,pit:14,cit:27,vat:15,minw:4,debtShort:45,rate:6.5,purchase:5,target:3,independence:75};
+const controls={
+ gov:[
+  {section:'Gasto público'},
+  ['spend','Gasto corriente (% PIB)',14,33,.5,'%'],['invest','Inversión pública (% PIB)',1,11,.25,'%'],['transfers','Transferencias (% PIB)',1,15,.5,'%'],
+  {section:'Impuestos (tasas, no recaudación)'},
+  ['pit','Impuesto renta personas',0,35,.5,'%'],['cit','Impuesto utilidades empresas',0,48,.5,'%'],['vat','Impuesto al consumo (IVA)',0,30,.5,'%'],
+  {section:'Trabajo y financiación'},
+  ['minw','Ajuste anual salario mínimo',-5,25,.5,'%'],['debtShort','Parte de NUEVA deuda a corto plazo',0,100,5,'%']
+ ],
+ cb:[
+  {section:'Política monetaria'},
+  ['rate','Tasa de interés nominal anual',0,32,.25,'%'],['target','Meta anual de inflación',1,8,.25,'%'],
+  {section:'Relación con el fisco'},
+  ['purchase','Monetización permitida (% déficit)',0,90,5,'%'],['independence','Compromiso de estabilidad monetaria',0,100,5,'%']
+ ]
+};
+let role='gov',ruleOn=true,initialElection=40,p={...defaults},state=null,history=[],events=[],fullEvents=[],records=[],pendingDecisions=[],finalElection=null,lastCsv='',timer=null,previewTimer=null,previewDeadline=0,phase='setup',running=false,ended=false,randomState=123456789,gameSeed=123456789,currentNews=[],newsHistory=[],incomeAnchor=100;
+function rand(){randomState=(1664525*randomState+1013904223)>>>0;return randomState/4294967296}
+function noise(){return rand()+rand()+rand()+rand()-2}
+// Se permiten semillas repetibles para pruebas, pero cada partida normal obtiene una semilla nueva.
+function newSeed(){
+ try{if(typeof window.crypto?.getRandomValues==='function')return window.crypto.getRandomValues(new Uint32Array(1))[0]>>>0;}
+ catch(_e){}
+ return (Math.floor(Math.random()*4294967296))>>>0;
+}
+function gaussian(){const u=Math.max(1e-12,rand()),v=rand();return clamp(Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v),-3,3)}
+const SHOCK_EVENT_PROB=0.07;
+function newShocks(s){
+ // Dos procesos AR(1) independientes: una lectura positiva de oferta significa MEJORES condiciones de oferta.
+ let demand=clamp(.70*s.shockD+.20*gaussian(),-4,4);
+ let supply=clamp(.82*s.shockS+.16*gaussian(),-4,4);
+ const events=[];
+ if(rand()<SHOCK_EVENT_PROB){
+  const impulse=(rand()<.5?-1:1)*(1.5+1.2*rand());
+  demand=clamp(demand+impulse,-4,4);
+  events.push({kind:'demanda',sign:Math.sign(impulse),impulse});
+ }
+ if(rand()<SHOCK_EVENT_PROB){
+  const impulse=(rand()<.5?-1:1)*(1.5+1.2*rand());
+  supply=clamp(supply+impulse,-4,4);
+  events.push({kind:'oferta',sign:Math.sign(impulse),impulse});
+ }
+ return {demand,supply,events};
+}
+const SHOCK_NEWS={
+ 'oferta+':[
+  ['Buen clima favorece las cosechas','Una temporada agrícola favorable mejora el abastecimiento y reduce las presiones sobre los costos.'],
+  ['Mejoras tecnológicas elevan la productividad','Nuevas eficiencias productivas permiten aumentar la oferta de bienes y servicios.'],
+  ['Se normalizan las cadenas de suministro','La recuperación de los transportes reduce las interrupciones y los costos de producción.']
+ ],
+ 'oferta-':[
+  ['Mal clima perjudica las cosechas','Las condiciones meteorológicas reducen la producción agrícola y presionan los precios.'],
+  ['Problemas logísticos afectan el abastecimiento','Una interrupción del transporte encarece los insumos y limita la capacidad productiva.'],
+  ['Aumentan los costos internacionales de la energía','Las empresas enfrentan mayores costos energéticos y dificultades de producción.']
+ ],
+ 'demanda+':[
+  ['Mejora la confianza de los consumidores','Los hogares incrementan inesperadamente su gasto y la demanda interna se fortalece.'],
+  ['Las exportaciones reciben un impulso inesperado','Un aumento de pedidos externos fortalece la demanda de producción nacional.'],
+  ['Repunte de la inversión privada','Las empresas adelantan proyectos y elevan la demanda de bienes y servicios.']
+ ],
+ 'demanda-':[
+  ['Cae la confianza de los consumidores','Los hogares retrasan compras y se contrae la demanda interna.'],
+  ['Se debilitan los pedidos del exterior','Una caída inesperada de exportaciones reduce la demanda de bienes nacionales.'],
+  ['Las empresas aplazan nuevas inversiones','El retroceso de planes empresariales reduce el gasto agregado.']
+ ]
+};
+function newsForEvent(ev,month){
+ const sign=ev.sign>0?'+':'-';
+ const choices=SHOCK_NEWS[ev.kind+sign];
+ const index=Math.floor(rand()*choices.length),[headline,body]=choices[index];
+ return {month,kind:ev.kind,sign:ev.sign,impulse:ev.impulse,headline,body};
+}
+function scheduleNewsTimeout(fn,delay){
+ const timerId=setTimeout(()=>{toastTimers.delete(timerId);fn()},delay);
+ toastTimers.add(timerId);
+}
+function clearNewsPopups(){
+ for(const timerId of toastTimers)clearTimeout(timerId);
+ toastTimers.clear();
+ $('newsToasts').replaceChildren();
+}
+function showNewsPopups(news){
+ const stack=$('newsToasts');
+ for(const itemNews of news){
+  const item=document.createElement('article');
+  item.className='news-toast '+(itemNews.sign>0?'good':'bad');
+  item.dataset.month=String(itemNews.month);item.dataset.kind=itemNews.kind;
+  const head=document.createElement('div');head.className='news-toast-head';
+  const type=document.createElement('span');type.className='news-toast-type';
+  type.textContent=`ÚLTIMA HORA · MES ${itemNews.month} · ${itemNews.kind} ${itemNews.sign>0?'positiva':'negativa'}`;
+  const close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label','Cerrar noticia');close.addEventListener('click',()=>item.remove());
+  head.append(type,close);
+  const title=document.createElement('h3');title.textContent=itemNews.headline;
+  const body=document.createElement('p');body.textContent=itemNews.body;
+  item.append(head,title,body);
+  stack.append(item);
+  scheduleNewsTimeout(()=>{if(item.isConnected)item.classList.add('expiring')},NEWS_POPUP_DURATION_MS-900);
+  scheduleNewsTimeout(()=>item.remove(),NEWS_POPUP_DURATION_MS);
+ }
+ // No perder noticias consecutivas: el contenedor admite desplazamiento cuando hay varias.
+ stack.scrollTop=stack.scrollHeight;
+}
+
+function fiscalScoreFromDistance(b){
+ // El techo no es un objetivo de deuda exacta: estar por debajo es cumplimiento,
+ // mientras que rebasarlo genera un costo creciente. Crédito moderado por holgura.
+ const distance=FISCAL_CEILING-b;
+ return !ruleOn?0:distance>=0?.04*Math.min(distance,15):.28*distance;
+}
+function drawSpending(s){
+ const categories=[
+  {name:'Gasto corriente',value:s.govSpend,color:'#60a5fa'},
+  {name:'Inversión pública',value:s.govInvest,color:'#2dd4bf'},
+  {name:'Transferencias',value:s.govTransfers,color:'#c4b5fd'},
+  {name:'Intereses',value:s.interestAnnualPct,color:'#fbbf24'},
+  {name:'Amortización del principal',value:s.amortAnnualPct,color:'#fb7185'}
+ ];
+ const total=categories.reduce((a,c)=>a+Math.max(0,c.value||0),0);
+ $('spendingStack').innerHTML=categories.map(c=>{
+  const share=total?100*Math.max(0,c.value||0)/total:0;
+  const value=share<5?fmt(share,0):fmt(share,1);
+  return `<div class="stack-part ${share<7?'tiny':''}" style="width:${share}%;background:${c.color}" role="img" aria-label="${c.name}: ${pct(share)} de los usos de caja" title="${c.name}: ${pct(share)}"><span class="stack-percentage">${share>0?value+' %':''}</span></div>`;
+ }).join('');
+ $('spendingLegend').innerHTML=categories.map(c=>`<div class="spend-row"><span class="spend-label"><i class="spend-swatch" style="background:${c.color}"></i>${c.name}</span></div>`).join('');
+
+}
+function renderControls(){
+ const items=controls[role];
+ $('sliders').innerHTML=items.map(it=>{
+  if(!Array.isArray(it))return `<div class="section-name">${it.section}</div>`;
+  const [id,label,min,max,step,unit]=it;
+  return `<div class="control"><div class="r"><label for="i_${id}">${label}</label><strong id="v_${id}"></strong></div><input type="range" id="i_${id}" min="${min}" max="${max}" step="${step}" value="${p[id]}" ${phase==='playing'||phase==='paused'?'':'disabled'}></div>`;
+ }).join('');
+ for(const it of items){if(!Array.isArray(it))continue;
+  const [id,,,,,unit]=it;
+  const update=()=>{$('v_'+id).textContent=fmt(p[id],['invest','rate','target'].includes(id)?2:1)+' '+unit;};update();
+  $('i_'+id).addEventListener('input',e=>{if(phase!=='playing'&&phase!=='paused')return;p[id]=Number(e.target.value);update();});
+  $('i_'+id).addEventListener('change',()=>{if(phase!=='playing'&&phase!=='paused')return;const msg='Nueva decisión del jugador: '+it[1]+' = '+fmt(p[id],1)+' '+unit+'.';pendingDecisions.push({mesDecision:state.m,mesAplicacion:state.m+1,instrumento:id,valor:p[id],descripcion:msg});log(msg);});
+ }
+ $('controlStatus').textContent=(phase==='playing'||phase==='paused')?'Modificables':'Bloqueados';
+}
+const prior=(m)=>{
+ const trendY=Math.pow(1.025,m/12), trendP=Math.pow(1.04,m/12), trendW=Math.pow(1.05,m/12);
+ const y=100*trendY,price=100*trendP,wage=100*trendW;
+ const netW=wage/(price/100),aggNet=netW;
+ return {m,y,yp:y,price,wage,pi:4,piFlow:4,gy:2.5,gyp:2.5,u:9,employment:91,b:55,e:initialElection,gap:0,rate:6.5,policyRate:6.5,taylorDesired:7.0,expectedPi:4,interestCost:6.5,shortDebtYield:shortIssueYield(6.5,55,.12),shortDebtStockPct:45,netW,realW:wage/(price/100),grossLabor:wage/(price/100),aggNet,primary:-1,revenue:32,revPit:6.3,revCit:5.94,revVat:8.25,revOther:11.5,laborBase:45,profitsBase:22,consBase:55,backing:1,risk:.12,monPurchase:5,shortShare:45,debtShortStock:24.75,debtLongStock:30.25,amortAnnualPct:30.8,interestAnnualPct:3.575,grossIssuanceAnnualPct:34.375,fiscalCeiling:70,fiscalDistance:15,fiscalScore:.6,ruleActive:true,newsCount:0,newsHeadlines:"",govPit:14,govCit:27,govVat:15,govSpend:22.5,govInvest:4.5,govTransfers:6,minW:4,monStock:7.5,shockD:0,shockS:0,shockEvent:0,kg:100,k:100,political:initialElection,politicalScore:0,recentPoliticalScore:0,mandatePoliticalScore:0,electoralMandateGrowth:2.5,electoralMandateUnemployment:9,electoralMandateIncome:0,lagNetGrowth:1,incomeGap:0};
+};
+function stop(){if(timer!==null){clearInterval(timer);timer=null}running=false}
+function stopPreview(){if(previewTimer!==null){clearInterval(previewTimer);previewTimer=null}previewDeadline=0}
+function setPhase(next){phase=next;document.body.className='stage-'+next}
+function resetGame(){
+ stop();stopPreview();clearNewsPopups();setPhase('setup');state=null;role=$('role').value;ruleOn=$('fiscalRule').value==='on';monthDurationMs=Number($('periodSeconds').value)*1000;previewDurationMs=Number($('previewSeconds').value)*1000;initialElection=Number($('initialElection').value);
+ p={...defaults};history=[];events=[];fullEvents=[];records=[];pendingDecisions=[];finalElection=null;lastCsv='';ended=false;currentNews=[];newsHistory=[];incomeAnchor=100;
+ $('clock').textContent='Configuración';$('gameSubtitle').textContent='Configuración';
+ $('pause').disabled=true;$('pause').textContent='Pausar';$('viewResults').hidden=true;hideResults();
+}
+function randomizeControls(){
+ for(const item of [...controls.gov,...controls.cb]){
+  if(!Array.isArray(item))continue;
+  const [key,,min,max,step]=item;
+  p[key]=Math.min(max,Math.max(min,Math.round((min+(max-min)*rand())/step)*step));
+ }
+}
+function varyPastControls(){
+ const relevant=controls[role].filter(Array.isArray);
+ for(const [key,,min,max,step] of relevant){
+  if(rand()>.72)continue;
+  const raw=p[key]+gaussian()*(max-min)*.045;
+  p[key]=clamp(Math.round(raw/step)*step,min,max);
+ }
+}
+function generatePrehistory(){
+ // Anclas de 12 meses más antiguos para calcular tasas interanuales sin rellenarlas con constantes.
+ // Los meses anteriores visibles (-12..-1) y el estado de diagnóstico (0) se simulan con el motor del jugador.
+ randomizeControls();
+ const start=-13,base=prior(start),b=35+rand()*50,yp=82+rand()*36,gap=-4+rand()*8;
+ const unemployment=5+rand()*13,price=84+rand()*32,wage=86+rand()*36,pi=1+rand()*9;
+ const rate=role==='cb'?p.rate:3+rand()*11,interestCost=clamp(rate+.5*gaussian(),.5,23);
+ const shortFraction=role==='gov'?p.debtShort/100:clamp(.2+rand()*.60,0,1);
+ const expectedPi=clamp(pi+.6*gaussian(),-1,20),y=yp*(1+gap/100);
+ const initPolicy={spend:p.spend,invest:p.invest,transfers:p.transfers,pit:p.pit,cit:p.cit,vat:p.vat,minw:p.minw,short:p.debtShort};
+ let init={...base,m:start,yp,y,gap,price,wage,pi,piFlow:pi,expectedPi,u:unemployment,b,rate,policyRate:rate,interestCost,
+   kg:75+rand()*50,k:75+rand()*50,shockD:-.5+rand(),shockS:-.5+rand(),monStock:5+rand()*9,
+   debtShortStock:b*shortFraction,debtLongStock:b*(1-shortFraction),taylorDesired:rate,
+   policyTarget:role==='cb'?p.target:3,monetaryIndependence:role==='cb'?p.independence:80,monPurchase:role==='cb'?p.purchase:5,
+   govSpend:role==='gov'?initPolicy.spend:22.5,govInvest:role==='gov'?initPolicy.invest:4.5,govTransfers:role==='gov'?initPolicy.transfers:6,
+   govPit:role==='gov'?initPolicy.pit:14,govCit:role==='gov'?initPolicy.cit:27,govVat:role==='gov'?initPolicy.vat:15,
+   minW:role==='gov'?initPolicy.minw:4,shortShare:shortFraction*100,shortDebtStockPct:100*shortFraction,shortDebtYield:shortIssueYield(rate,b,.12),e:initialElection,political:initialElection,politicalScore:0};
+ const ga=governmentPolicy(init,start);
+ init={...init,govSpend:ga.spend,govInvest:ga.invest,govTransfers:ga.transfers,govPit:ga.pit,govCit:ga.cit,govVat:ga.vat,minW:ga.minw,shortShare:ga.short};
+ const tax=taxAccounts({y,gap,u:unemployment,wage,price,pit:ga.pit,cit:ga.cit,vat:ga.vat,transfers:ga.transfers,realRateGap:rate-expectedPi-2.5});
+ init={...init,...tax,primary:tax.revenue-ga.spend-ga.invest-ga.transfers,realW:tax.realW,
+   amortAnnualPct:12*(b*shortFraction/SHORT_MATURITY_MONTHS+b*(1-shortFraction)/LONG_MATURITY_MONTHS),
+   interestAnnualPct:b*interestCost/100,grossIssuanceAnnualPct:3+rand()*4,
+   fiscalDistance:FISCAL_CEILING-b,fiscalScore:fiscalScoreFromDistance(b),ruleActive:ruleOn,incomeGap:0,
+   recentPoliticalScore:0,mandatePoliticalScore:0,recentFiscalScore:0,mandateFiscalScore:0,
+   electoralMandateGrowth:2.5,electoralMandateUnemployment:unemployment,electoralMandateIncome:0,
+   newsCount:0,newsHeadlines:''};
+ const initialGyp=-.5+rand()*5,initialGy=initialGyp+.6*gaussian();
+ history=[];
+ for(let m=-25;m<=-14;m++){
+   const diff=(m+13)/12,yyP=yp*Math.exp(diff*initialGyp/100);
+   const oldGap=gap+.45*Math.sin((m+13)*.65),yy=yyP*(1+oldGap/100);
+   const oldPrice=price*Math.exp(diff*pi/100),oldWage=wage*Math.exp(diff*(pi+1)/100);
+   const oldU=clamp(unemployment+.55*Math.sin(m*.65),2,42),oldB=clamp(b-.7*(m+13)/12,0,230);
+   const oldTax=taxAccounts({y:yy,gap:oldGap,u:oldU,wage:oldWage,price:oldPrice,pit:ga.pit,cit:ga.cit,vat:ga.vat,transfers:ga.transfers,realRateGap:rate-expectedPi-2.5});
+   history.push({...init,m,yp:yyP,y:yy,gap:oldGap,price:oldPrice,wage:oldWage,u:oldU,b:oldB,
+     ...oldTax,primary:oldTax.revenue-ga.spend-ga.invest-ga.transfers,gy:initialGy,gyp:initialGyp,
+     fiscalDistance:70-oldB,fiscalScore:fiscalScoreFromDistance(oldB)});
+ }
+ history.push({...init});state={...init};
+ for(let j=0;j<13;j++){
+   if(j>0&&j%3===0)varyPastControls();
+   tick({prehistory:true});
+ }
+ // La popularidad inicial es una condición contractual del juego, incluso si la economía arranca en crisis.
+ state={...state,e:initialElection,political:initialElection,politicalScore:0,desiredPolitical:initialElection};
+ history[history.length-1]={...state};incomeAnchor=state.netW;
+ records=history.filter(s=>s.m>=-12).map(s=>makeRecord(s,[],true));
+}
+function prepareGame(){
+ if(phase!=='setup')return;
+ role=$('role').value;ruleOn=$('fiscalRule').value==='on';monthDurationMs=Number($('periodSeconds').value)*1000;previewDurationMs=Number($('previewSeconds').value)*1000;initialElection=Number($('initialElection').value);
+ clearNewsPopups();gameSeed=newSeed();randomState=gameSeed;events=[];fullEvents=[];currentNews=[];newsHistory=[];records=[];pendingDecisions=[];finalElection=null;lastCsv='';ended=false;
+ generatePrehistory();setPhase('preview');$('previewBanner').hidden=false;$('pause').disabled=true;
+ $('gameSubtitle').textContent=`Diagnóstico · ${monthDurationMs/1000} segundos por mes`;
+ renderControls();draw();
+ previewDeadline=Date.now()+previewDurationMs;
+ const update=()=>{
+  if(phase!=='preview')return;
+  const remaining=Math.max(0,Math.ceil((previewDeadline-Date.now())/1000));
+  $('previewCountdown').textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0');
+  if(remaining<=0){stopPreview();beginGame();}
+ };
+ update();previewTimer=setInterval(update,250);
+}
+function beginGame(){
+ if(phase!=='preview'||ended)return;
+ stopPreview();$('previewBanner').hidden=true;setPhase('playing');running=true;
+ $('pause').disabled=false;$('pause').textContent='Pausar';$('gameSubtitle').textContent=`Partida activa · ${monthDurationMs/1000} segundos por mes`;
+ renderControls();log(`Comienza la partida: ${monthDurationMs/1000} segundos por mes. Se conservan las condiciones y las políticas heredadas.`);
+ draw();timer=setInterval(tick,monthDurationMs);
+}
+function log(msg,atMonth=state?state.m:0){const event={t:atMonth,msg};fullEvents.push(event);events.unshift(event);events=events.slice(0,14);}
+function makeRecord(s,decisions,historical=false){
+ const row={etapa:s.m<0?'historia_previa':s.m===0?'diagnostico_inicial':'partida',rol_jugador:role,regla_fiscal_elegida:ruleOn?'con_regla':'sin_regla',segundos_por_mes:monthDurationMs/1000,segundos_diagnostico:previewDurationMs/1000,probabilidad_electoral_inicial:initialElection,...s,deficitPrimario:-s.primary};
+ const applied={spend:'govSpend',invest:'govInvest',transfers:'govTransfers',pit:'govPit',cit:'govCit',vat:'govVat',minw:'minW',debtShort:'shortShare',rate:'rate',purchase:'monPurchase',target:'policyTarget',independence:'monetaryIndependence'};
+ for(const [key,value] of Object.entries(p)){
+  const active=role==='gov'?!['rate','purchase','target','independence'].includes(key):['rate','purchase','target','independence'].includes(key);
+  row['instrumento_elegido_'+key]=active?(historical?s[applied[key]]:value):'';
+  row['instrumento_aplicado_'+key]=s[applied[key]]??'';
+ }
+ row.decisiones_del_jugador=historical?'no; política heredada':'sí; sujeto a decisiones desde el mes 1';
+ row.implementaciones_jugador=decisions.map(d=>d.descripcion).join(' | ');
+ row.acontecimientos_mes=fullEvents.filter(e=>e.t===s.m).map(e=>e.msg).join(' | ');
+ row.noticias_mes=newsHistory.filter(n=>n.month===s.m).map(n=>n.headline).join(' | ');
+ row.semilla_partida=gameSeed;
+ if(s.m===48&&finalElection){row.resultado_eleccion=finalElection.win?'reelegido':'no reelegido';row.regla_resultado_electoral='Reelegido si probabilidad final > 50 %';}
+ return row;
+}
+function buildCSV(){
+ const cols=Array.from(new Set(records.flatMap(row=>Object.keys(row))));
+ const escapeCell=value=>{if(value===undefined||value===null)return '';const v=String(value);return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+ return '\uFEFF'+cols.map(escapeCell).join(',')+'\r\n'+records.map(row=>cols.map(col=>escapeCell(row[col])).join(',')).join('\r\n')+'\r\n';
+}
+function downloadCSV(){
+ if(!lastCsv)lastCsv=buildCSV();
+ if(typeof Blob==='undefined'||typeof URL==='undefined'||typeof URL.createObjectURL!=='function')return false;
+ try{
+  const url=URL.createObjectURL(new Blob([lastCsv],{type:'text/csv;charset=utf-8;'}));
+  const a=document.createElement('a');a.href=url;a.download='politica_economica_v15_'+role+'_12_meses_previos_y_48_jugados.csv';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),10000);return true;
+ }catch(_e){return false;}
+}
+
+function buildEventsTXT(){
+ const title=['POLÍTICA ECONÓMICA — HISTORIA DE ACONTECIMIENTOS',
+  'Modalidad: '+(role==='gov'?'Gobierno':'Banco Central'),
+  'Regla fiscal: '+(ruleOn?'Activa, techo 70 % del PIB':'Inactiva'),
+  'Duración de cada mes: '+monthDurationMs/1000+' segundos',
+  'Diagnóstico inicial: '+previewDurationMs/1000+' segundos',
+  'Semilla de la partida: '+gameSeed,
+  'Probabilidad electoral inicial: '+pct(initialElection,0),
+  '',
+  'RESULTADO AL FINAL DEL MES 48',
+  'Brecha del PIB: '+pct(state.gap,2),
+  'Inflación: '+pct(state.pi,2),
+  'Desempleo: '+pct(state.u,2),
+  'Deuda pública / PIB: '+pct(state.b,2),
+  'Probabilidad final de reelección: '+pct(state.e,2),
+  'Resultado: '+(finalElection?.win?'Gobierno reelegido':'Gobierno no reelegido'),
+  '',
+  'CRONOLOGÍA DE ACONTECIMIENTOS',
+  ''];
+ const historical=newsHistory.filter(n=>n.month<1).sort((a,b)=>a.month-b.month);
+ for(const n of historical)title.push(`[Mes ${n.month} · Historia previa] ${n.headline}. ${n.body}`);
+ const chronological=fullEvents.map((e,i)=>({...e,order:i})).sort((a,b)=>a.t-b.t||a.order-b.order);
+ for(const e of chronological)title.push(`[Mes ${e.t}] ${e.msg}`);
+ if(!historical.length&&!chronological.length)title.push('No se registraron acontecimientos.');
+ return '\uFEFF'+title.join('\r\n')+'\r\n';
+}
+function downloadTXT(){
+ if(typeof Blob==='undefined'||typeof URL==='undefined'||typeof URL.createObjectURL!=='function')return false;
+ try{
+  const url=URL.createObjectURL(new Blob([buildEventsTXT()],{type:'text/plain;charset=utf-8'}));
+  const a=document.createElement('a');a.href=url;a.download='politica_economica_v15_'+role+'_acontecimientos.txt';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),10000);return true;
+ }catch(_e){return false;}
+}
+function downloadResults(){
+ if(!ended)return false;
+ const csvOK=downloadCSV();
+ const txtOK=downloadTXT();
+ return csvOK&&txtOK;
+}
+function hideResults(){
+ $('resultsOverlay').hidden=true;document.body.classList.remove('has-results');
+}
+function showResults(){
+ if(!ended||!state||!finalElection)return;
+ $('rGAP').textContent=pct(state.gap,2);
+ $('rPI').textContent=pct(state.pi,2);
+ $('rU').textContent=pct(state.u,2);
+ $('rB').textContent=pct(state.b,2);
+ for(const [id,src] of [['rGAP','kGAP'],['rPI','kPI'],['rU','kU'],['rB','kB']]){
+  const el=$(id);el.classList.remove('is-good','is-bad');
+  if($(src).classList.contains('is-good'))el.classList.add('is-good');
+  if($(src).classList.contains('is-bad'))el.classList.add('is-bad');
+ }
+ const isWin=finalElection.win;
+ $('resultsElection').classList.toggle('negative',!isWin);
+ $('resultsElectionText').textContent=role==='gov'?(isWin?'Has sido reelegido':'No has sido reelegido'):(isWin?'El gobierno ha sido reelegido':'El gobierno no ha sido reelegido');
+ $('resultsElectionProbability').textContent='Probabilidad electoral al cierre: '+pct(state.e,1);
+ $('resultsOverlay').hidden=false;document.body.classList.add('has-results');
+ $('downloadResults').focus();
+}
+// Las bases tributarias se expresan como porcentaje del PIB. Los 11,5 pp de «otros» son una fuente fija en términos relativos.
+function taxAccounts({y,gap,u,wage,price,pit,cit,vat,transfers,realRateGap}){
+ const employment=100-u, realW=wage/(price/100);
+ const grossLabor=realW*employment/91;
+ const netW=realW*(1-pit/100)/.86; // Salario real neto de renta por ocupado; el IPC YA incorpora el IVA.
+ const aggNet=netW*employment/91;
+ const laborBase=clamp(45*grossLabor/y,25,66);
+ const profitsBase=clamp(22+.75*gap-.15*(laborBase-45),9,35);
+ const consBase=clamp(55+.12*(aggNet-100)+.25*(transfers-6)-.22*(vat-15)-.10*realRateGap,40,68);
+ const revPit=pit/100*laborBase,revCit=cit/100*profitsBase,revVat=vat/100*consBase,revOther=11.5+.10*gap;
+ const revenue=revPit+revCit+revVat+revOther;
+ return {employment,realW,grossLabor,netW,aggNet,laborBase,profitsBase,consBase,revPit,revCit,revVat,revOther,revenue};
+}
+function governmentPolicy(s,t){
+ if(role==='gov')return {spend:p.spend,invest:p.invest,transfers:p.transfers,pit:p.pit,cit:p.cit,vat:p.vat,minw:p.minw,short:p.debtShort};
+ const electoral=t>=32?1:0;
+ const adjust=ruleOn?Math.max(0,s.b-65):0;
+ return {spend:clamp(22.5+1.0*electoral-.07*(s.b-55)-.14*adjust,14,29),invest:4.5,transfers:6+.6*electoral,
+  pit:clamp(14+.055*(s.b-55)+.11*adjust,7,35),cit:clamp(27+.055*(s.b-55),14,38),vat:clamp(15+.065*(s.b-55)+.075*adjust,7,30),
+  minw:4+1.5*electoral,short:45};
+}
+function tick(options={}){
+ const prehistory=options.prehistory===true;
+ if(ended)return;
+ const s=state,t=s.m+1,gf=governmentPolicy(s,t);
+ const shockDraw=newShocks(s),shockD=shockDraw.demand,shockS=shockDraw.supply;
+ currentNews=shockDraw.events.map(ev=>newsForEvent(ev,t));
+ if(!prehistory&&currentNews.length)showNewsPopups(currentNews);
+ newsHistory.push(...currentNews);
+ for(const n of prehistory?[]:currentNews){log(`NOTICIA: ${n.headline}. Choque de ${n.kind} ${n.sign>0?'positivo':'negativo'} (impulso ${n.impulse>0?'+':''}${fmt(n.impulse,2)}).`,t);}
+ // Regla de Taylor: i*=r_n+pi_obj+1.5(pi_pasada-pi_obj)+0.5 brecha pasada.
+ // El banco central observa la inflación interanual del cierre anterior; no anticipa el shock del mes actual.
+ const target=role==='cb'?p.target:TAYLOR_INFLATION_TARGET;
+ const taylorDesired=clamp(TAYLOR_NEUTRAL_REAL_RATE+TAYLOR_INFLATION_TARGET+
+    TAYLOR_PHI_INFLATION*(s.pi-TAYLOR_INFLATION_TARGET)+TAYLOR_PHI_OUTPUT*s.gap,0,28);
+ const i=role==='cb'?p.rate:clamp(s.policyRate+TAYLOR_SPEED*(taylorDesired-s.policyRate),0,28);
+ const purchase=role==='cb'?p.purchase:clamp(5+10*s.risk,0,35);
+ const independence=role==='cb'?p.independence:80;
+ const realRateGap=i-s.expectedPi-2.5;
+ const kg=clamp(s.kg*(1-.04/12)+(.04*100/12)*(gf.invest/4.5),20,300);
+ const investPrivate=clamp(1+.014*(27-gf.cit)-.022*realRateGap+.012*s.gap,.35,1.7);
+ const k=clamp(s.k*(1-.05/12)+(.05*100/12)*investPrivate,20,300);
+ const potMonthly=clamp(Math.log(1.025)/12+.000065*(gf.invest-4.5)+.000022*(27-gf.cit)+.00026*(kg-100)/100+.00013*(k-100)/100+.0028*(shockS-s.shockS),-.018,.018);
+ const yp=s.yp*Math.exp(potMonthly);
+ const gap=clamp(.83*s.gap+.072*(gf.spend-22.5)+.048*(gf.transfers-6)+.085*(gf.invest-4.5)-.077*(gf.pit-14)-.070*(gf.vat-15)-.055*(gf.cit-27)-.15*realRateGap+.25*shockD+.09*shockS-.007*Math.max(0,s.b-75),-24,24);
+ const y=yp*(1+gap/100);
+ // Proyección fiscal para el canal de respaldo: se calcula ANTES de los precios contemporáneos.
+ const preTax=taxAccounts({y,gap,u:s.u,wage:s.wage,price:s.price,pit:gf.pit,cit:gf.cit,vat:gf.vat,transfers:gf.transfers,realRateGap});
+ const projectedPrimary=preTax.revenue-gf.spend-gf.invest-gf.transfers;
+ const projectedSpace=projectedPrimary-s.b*s.interestCost/100;
+ const referenceSpace=-4.575; // Estado inicial: saldo primario -1, intereses 3,575.
+ const backing=clamp(Math.exp(.030*(projectedSpace-referenceSpace)-.012*Math.max(0,s.b-65)),.18,2.8);
+ const fiscalPressure=Math.max(0,-Math.log(backing));
+ const risk=clamp(.12+.030*Math.max(0,referenceSpace-projectedSpace)+.006*Math.max(0,s.b-65)+.003*Math.max(0,80-independence)+.0020*purchase,0,1);
+ const binding=Math.max(0,gf.minw-(s.expectedPi+1.2));
+ // Flujo de inflación mensual en tasa anualizada; IVA de una sola vez pasa al nivel de precios.
+ const piFlow=clamp(s.piFlow+.065*(target-s.piFlow)+.045*gap+.022*binding+.15*shockD-.45*shockS+.63*risk*fiscalPressure+.011*(purchase-5)-.034*Math.max(0,realRateGap),-7,80);
+ const vatPricePass=.45*Math.log((1+gf.vat/100)/(1+s.govVat/100));
+ const price=s.price*Math.exp(piFlow/1200+vatPricePass);
+ const lag=history.find(h=>h.m===t-12)||history[0];
+ const pi=100*(price/lag.price-1);
+ const expectedPi=clamp(.78*s.expectedPi+.22*pi+.16*risk*fiscalPressure,-5,65);
+ const uTarget=clamp(9-.43*gap+.048*binding+.032*(gf.cit-27)+.015*Math.max(0,realRateGap),2,40);
+ const u=clamp(s.u+.22*(uTarget-s.u)+.028*noise(),2,42);
+ const nominalWageGrowth=clamp(s.expectedPi+1.0+.31*(gf.minw-(s.expectedPi+.8))+.16*gap-.09*(u-9),-9,32);
+ const wage=s.wage*Math.exp(nominalWageGrowth/1200);
+ const acc=taxAccounts({y,gap,u,wage,price,pit:gf.pit,cit:gf.cit,vat:gf.vat,transfers:gf.transfers,realRateGap});
+ const primary=acc.revenue-gf.spend-gf.invest-gf.transfers;
+ const debtInterest=s.b*s.interestCost/100;
+ const financingNeed=Math.max(0,debtInterest-primary);
+ const monetaryCoverage=Math.min(1.5,financingNeed*purchase/100);
+ const nominalGDPGrowth=(y/s.y)*(price/s.price);
+ // Cartera por plazo: las amortizaciones se pagan o refinancian, NO son gasto primario.
+ // Las existencias están medidas en puntos del PIB nominal del mes anterior.
+ const dueShort=s.debtShortStock/SHORT_MATURITY_MONTHS, dueLong=s.debtLongStock/LONG_MATURITY_MONTHS;
+ const accruedInterest=s.b*s.interestCost/1200;
+ const netBorrowing=accruedInterest-primary/12-monetaryCoverage/12;
+ const targetDebtNominal=Math.max(0,s.b+netBorrowing);
+ let remShort=Math.max(0,s.debtShortStock-dueShort),remLong=Math.max(0,s.debtLongStock-dueLong);
+ const normalAmort=dueShort+dueLong;
+ const additionalRepayment=Math.max(0,remShort+remLong-targetDebtNominal);
+ let extra=additionalRepayment;
+ const longRepay=Math.min(remLong,extra);remLong-=longRepay;extra-=longRepay;
+ const shortRepay=Math.min(remShort,extra);remShort-=shortRepay;
+ const grossIssue=Math.max(0,targetDebtNominal-(remShort+remLong));
+ remShort+=grossIssue*gf.short/100;remLong+=grossIssue*(1-gf.short/100);
+ let debtShortStock=remShort/nominalGDPGrowth,debtLongStock=remLong/nominalGDPGrowth;
+ const capScaling=Math.min(1,230/Math.max(1e-9,debtShortStock+debtLongStock));
+ debtShortStock*=capScaling;debtLongStock*=capScaling;
+ const b=debtShortStock+debtLongStock;
+ const amortAnnualPct=12*(normalAmort+additionalRepayment)/nominalGDPGrowth;
+ const interestAnnualPct=12*accruedInterest/nominalGDPGrowth;
+ const grossIssuanceAnnualPct=12*grossIssue/nominalGDPGrowth;
+ const monStock=clamp(s.monStock/nominalGDPGrowth+monetaryCoverage/12,0,80);
+ const stockShortFraction=b>0?debtShortStock/b:gf.short/100;
+ const interestCost=clamp(s.interestCost+(.05+.18*stockShortFraction)*(i-s.interestCost)+.015*Math.max(0,b-65)+.16*risk*fiscalPressure,0,50);
+ const shortDebtYield=shortIssueYield(i,b,risk);
+ const shortDebtStockPct=b>1e-9?100*debtShortStock/b:0;
+ const gy=100*(y/lag.y-1),gyp=100*(yp/lag.yp-1);
+ const lagNetGrowth=100*(acc.netW/lag.netW-1);
+ const incomeGap=prehistory?0:100*(acc.netW/(incomeAnchor*Math.pow(1.01,t/12))-1); // Brecha vs trayectoria neutral de ingreso real (+1 % anual).
+ // Historial explícito: 65 % resultados de los últimos 12 meses y 35 % desde el comienzo del mandato.
+ // Solo se promedian meses jugados (1..t), no la historia sintética -12..0 usada para tasas anuales.
+ const played=history.filter(h=>h.m>=1);
+ const recent=played.filter(h=>h.m>=Math.max(1,t-11));
+ const avg=(data,key,latest)=>[...data.map(h=>h[key]),latest].reduce((a,v)=>a+v,0)/(data.length+1);
+ const ag=avg(recent,'gy',gy),au=avg(recent,'u',u),aincome=avg(recent,'incomeGap',incomeGap);
+ const mg=avg(played,'gy',gy),mu=avg(played,'u',u),mincome=avg(played,'incomeGap',incomeGap);
+ const fiscalDistance=FISCAL_CEILING-b;
+ const fiscalScore=fiscalScoreFromDistance(b);
+ const recentFiscalScore=avg(recent,'fiscalScore',fiscalScore);
+ const mandateFiscalScore=avg(played,'fiscalScore',fiscalScore);
+ const recentPoliticalScore=.22*(ag-2.5)-.17*(au-9)+.10*aincome+recentFiscalScore;
+ const mandatePoliticalScore=.22*(mg-2.5)-.17*(mu-9)+.10*mincome+mandateFiscalScore;
+ const politicalScore=clamp(.65*recentPoliticalScore+.35*mandatePoliticalScore,-12,12);
+ const desiredPolitical=clamp(initialElection+7*politicalScore,1,99);
+ const political=prehistory?initialElection:clamp(s.political+.11*(desiredPolitical-s.political),1,99);
+ state={...s,m:t,kg,k,shockD,shockS,shockEvent:shockDraw.events.length,y,yp,gap,price,pi,piFlow,expectedPi,u,b,monStock,
+   ...acc,primary,debtShortStock,debtLongStock,amortAnnualPct,interestAnnualPct,grossIssuanceAnnualPct,
+   fiscalCeiling:FISCAL_CEILING,fiscalDistance,fiscalScore,ruleActive:ruleOn,shortDebtYield,shortDebtStockPct,newsCount:currentNews.length,newsHeadlines:currentNews.map(n=>n.headline).join(' | '),rate:i,policyRate:i,taylorDesired:role==='gov'?taylorDesired:null,interestCost,backing,risk,monPurchase:purchase,shortShare:gf.short,
+   wage,gy,gyp,lagNetGrowth,incomeGap,politicalScore,political,e:political,govPit:gf.pit,govCit:gf.cit,govVat:gf.vat,
+   govSpend:gf.spend,govInvest:gf.invest,govTransfers:gf.transfers,minW:gf.minw,
+   electoralGrowth:ag,electoralUnemployment:au,electoralIncome:aincome,
+   electoralMandateGrowth:mg,electoralMandateUnemployment:mu,electoralMandateIncome:mincome,
+   recentPoliticalScore,mandatePoliticalScore,recentFiscalScore,mandateFiscalScore,desiredPolitical,
+   policyTarget:target,monetaryIndependence:independence};
+ history.push({...state});
+ if(prehistory)return;
+ if(role==='gov'&&Math.abs(i-s.policyRate)>=.20&&((i>s.policyRate&&s.pi>=TAYLOR_INFLATION_TARGET)||(i<s.policyRate&&s.pi<TAYLOR_INFLATION_TARGET)))log(`Taylor: tasa ${i>s.policyRate?'sube':'baja'} a ${pct(i,2)} (inflación previa ${pct(s.pi)}; meta 3 %).`);
+ if([12,24,36].includes(t))log(`Balance anual: PIB ${pct(gy)}, inflación ${pct(pi)}, desempleo ${pct(u)}, recaudo ${pct(acc.revenue)} del PIB.`);
+ if(b>FISCAL_CEILING&&s.b<=FISCAL_CEILING)log(`Alerta: la deuda ha superado el techo fiscal de ${FISCAL_CEILING} % del PIB${ruleOn?' (incumplimiento de la regla)':' (referencia informativa)'}.`,t);
+ if(b<=FISCAL_CEILING&&s.b>FISCAL_CEILING)log('La deuda vuelve a estar por debajo del techo fiscal del 70 % del PIB.',t);
+ if(risk>.60&&s.risk<=.60)log('Alerta: aumento de la fragilidad del respaldo fiscal esperado.');
+ if(pi>12&&s.pi<=12)log('Alerta: inflación interanual superior al 12 %.');
+ if(t===48){ended=true;stop();setPhase('ended');const win=political>50;finalElection={win,threshold:50};log((role==='gov'?'ELECCIÓN: ':'Fin de mandato: ')+(win?'gana el gobierno titular.':'pierde el gobierno titular.')+` Indicador electoral final ${pct(political)}; criterio: superior al 50 %.`);$('pause').disabled=true;}
+ // Cada fila conserva los instrumentos efectivamente elegidos y los eventos del mes, incluso si no aparecen en pantalla.
+ const decisions=pendingDecisions.splice(0);
+ records.push(makeRecord(state,decisions));
+ draw();
+ if(t===48){lastCsv=buildCSV();$('viewResults').hidden=false;showResults();}
+}
+function graph(id,series,refLines=[]){
+ const canvas=$(id),rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+ const w=Math.max(240,rect.width),h=Math.max(130,rect.height);
+ canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);
+ const data=history.filter(x=>x.m>=-12),vals=series.flatMap(ss=>data.map(dd=>dd[ss.key])).filter(Number.isFinite).concat(refLines.map(r=>r.value));
+ let min=Math.min(...vals),max=Math.max(...vals);if(max-min<.8){min-=.5;max+=.5}else{const pad=.15*(max-min);min-=pad;max+=pad;}
+ const left=43,right=w-13,top=9,bottom=h-26,X=j=>left+(right-left)*(data.length<2?.5:j/(data.length-1)),Y=v=>bottom-(v-min)/(max-min)*(bottom-top);
+ c.font='10px system-ui';c.fillStyle='#9bacc2';c.strokeStyle='#293a50';c.lineWidth=1;
+ for(let j=0;j<=4;j++){const v=min+(max-min)*j/4,yy=Y(v);c.beginPath();c.moveTo(left,yy);c.lineTo(right,yy);c.stroke();c.fillText(fmt(v),3,yy+3)}
+ c.fillText(String(data[0]?.m??-12),left,bottom+16);c.fillText(String(state.m),right-20,bottom+16);
+ const zero=data.findIndex(d=>d.m===0);if(zero>=0&&zero<data.length-1){c.beginPath();c.strokeStyle='#667e97';c.lineWidth=1;c.setLineDash([3,3]);c.moveTo(X(zero),top);c.lineTo(X(zero),bottom);c.stroke();c.setLineDash([]);c.fillStyle='#9bacc2';c.fillText('Inicio',Math.min(right-32,X(zero)+4),top+12);}
+ for(const reference of refLines){c.beginPath();c.strokeStyle=reference.color||'#fbbf24';c.lineWidth=1.5;c.setLineDash([6,4]);c.moveTo(left,Y(reference.value));c.lineTo(right,Y(reference.value));c.stroke();c.setLineDash([]);c.fillStyle=reference.color||'#fbbf24';c.fillText(reference.label||String(reference.value),right-90,Y(reference.value)-5);}
+ for(const ss of series){c.strokeStyle=ss.color;c.lineWidth=2.2;c.beginPath();data.forEach((dd,j)=>{const yy=Y(dd[ss.key]);if(j===0)c.moveTo(X(j),yy);else c.lineTo(X(j),yy)});c.stroke();const last=data.at(-1);c.fillStyle=ss.color;c.beginPath();c.arc(X(data.length-1),Y(last[ss.key]),3.6,0,Math.PI*2);c.fill()}
+}
+// Colores: verde = favorable respecto a una referencia; rojo = desfavorable.
+// Las tasas de interés y la composición por plazos no tienen un signo de bienestar
+// universal: permanecen neutrales en vez de asignar una señal engañosa.
+function colorIndicator(id,score){
+ const el=$(id);
+ const tone=score>0?'is-good':score<0?'is-bad':'is-neutral';
+ el.classList.remove('is-good','is-bad','is-neutral');
+ el.classList.add(tone);
+}
+function draw(){
+ const s=state;
+ $('clock').textContent=phase==='preview'?'Diagnóstico · Mes 0':`Mes ${s.m} / 48`;
+ $('kGAP').textContent=pct(s.gap,2);
+ $('kGapInfo').textContent='PIB real vs. potencial · Crec. PIB: '+pct(s.gy);
+ $('kPI').textContent=pct(s.pi);$('kInflationTarget').textContent='Meta de inflación: '+pct(s.policyTarget??3);$('kU').textContent=pct(s.u);$('kEMP').textContent='Empleo: '+pct(100-s.u);
+ $('kB').textContent=pct(s.b);$('kS').textContent=`Distancia al techo de 70 %: ${fmt(FISCAL_CEILING-s.b,1)} pp`;
+ $('kDeficit').textContent=pct(-s.primary);
+ $('kShortStockPct').textContent=pct(s.shortDebtStockPct??(s.b>0?100*s.debtShortStock/s.b:0),2);
+ $('kShortStockInfo').textContent='Saldo corto: '+pct(s.debtShortStock??0,2)+' del PIB · No emisión nueva';
+ $('kPolicyRate').textContent=pct(s.rate,2);
+ $('kE').textContent=pct(s.e);$('kEGap').textContent=(ruleOn?'Regla 70 % activa · ':'Sin regla · ')+'Ingreso agregado: '+fmt(s.aggNet);
+ // Referencias explícitas: 0 para brecha y déficit, 3 % (o meta elegida)
+ // para inflación, 9 % para desempleo y 70 % para deuda. Para reelección,
+ // exclusivamente >50 % es favorable; 50 % o menos es desfavorable.
+ const close=(value,benchmark,tolerance)=>Math.abs(value-benchmark)<=tolerance;
+ const inflationTarget=s.policyTarget??3;
+ colorIndicator('kGAP',close(s.gap,0,.15)?0:Math.sign(s.gap));
+ colorIndicator('kPI',close(s.pi,inflationTarget,.15)?0:s.pi<0?-1:Math.sign(inflationTarget-s.pi));
+ colorIndicator('kU',close(s.u,9,.15)?0:Math.sign(9-s.u));
+ colorIndicator('kE',s.e>50?1:-1);
+ colorIndicator('kB',close(s.b,FISCAL_CEILING,.15)?0:Math.sign(FISCAL_CEILING-s.b));
+ colorIndicator('kDeficit',close(-s.primary,0,.05)?0:Math.sign(s.primary));
+ colorIndicator('kShortStockPct',0);
+ colorIndicator('kPolicyRate',0);
+ drawSpending(s);
+ graph('chartY',[{key:'y',color:'#60a5fa'},{key:'yp',color:'#2dd4bf'}]);
+ graph('chartGrowth',[{key:'gy',color:'#60a5fa'},{key:'gyp',color:'#2dd4bf'}]);
+ graph('chartPrices',[{key:'pi',color:'#fbbf24'},{key:'u',color:'#fb7185'}]);
+ graph('chartPolitical',[{key:'b',color:'#60a5fa'},{key:'e',color:'#2dd4bf'}],[{value:FISCAL_CEILING,label:'Techo 70 %',color:'#fbbf24'}]);
+ graph('chartIncomes',[{key:'netW',color:'#2dd4bf'},{key:'aggNet',color:'#c4b5fd'}]);
+ graph('chartTax',[{key:'revPit',color:'#60a5fa'},{key:'revCit',color:'#fb7185'},{key:'revVat',color:'#fbbf24'}]);
+ graph('chartRate',role==='gov'?[{key:'rate',color:'#2dd4bf'},{key:'taylorDesired',color:'#fbbf24'}]:[{key:'rate',color:'#2dd4bf'}]);
+}
+$('configure').addEventListener('click',prepareGame);
+$('pause').addEventListener('click',()=>{
+ if(phase==='playing'){stop();setPhase('paused');$('pause').textContent='Continuar';log('Partida pausada.');renderControls();}
+ else if(phase==='paused'&&!ended){setPhase('playing');running=true;$('pause').textContent='Pausar';timer=setInterval(tick,monthDurationMs);renderControls();}
+});
+$('reset').addEventListener('click',resetGame);
+$('downloadResults').addEventListener('click',downloadResults);
+$('newGameFromResults').addEventListener('click',()=>{resetGame();window.scrollTo(0,0);});
+$('viewResults').addEventListener('click',showResults);
+$('closeResults').addEventListener('click',hideResults);
+$('resultsOverlay').addEventListener('click',e=>{if(e.target===$('resultsOverlay'))hideResults()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('resultsOverlay').hidden)hideResults()});
+window.addEventListener('resize',()=>{if(state&&phase!=='setup')draw()});
+const speedPicker=$('periodSeconds');
+const refreshSpeed=()=>{$('periodSecondsValue').textContent=`${speedPicker.value} segundo${Number(speedPicker.value)===1?'':'s'}`};
+speedPicker.addEventListener('input',refreshSpeed);refreshSpeed();
+const previewPicker=$('previewSeconds');
+const refreshPreview=()=>{$('previewSecondsValue').textContent=`${previewPicker.value} segundos`};
+previewPicker.addEventListener('input',refreshPreview);refreshPreview();
+resetGame();
+window.__economicGameTest={tick,getState:()=>state?({...state}):null,getHistory:()=>history.map(h=>({...h})),setControl:(key,value)=>{if(!(key in p))throw Error('Instrumento desconocido');p[key]=value},getControls:()=>({...p}),setRole:(r)=>{$('role').value=r;resetGame()},getIntervalMs:()=>monthDurationMs,reset:resetGame,setSeed:(seed)=>{gameSeed=seed>>>0;randomState=gameSeed},getSeed:()=>gameSeed,getEvents:()=>events.map(x=>({...x})),getAllEvents:()=>fullEvents.map(x=>({...x})),getRecords:()=>records.map(x=>({...x})),getCSV:()=>buildCSV(),getElection:()=>finalElection,getNews:()=>newsHistory.map(n=>({...n})),setRule:(r)=>{$('fiscalRule').value=r?'on':'off';resetGame()},getRule:()=>ruleOn,getElectionStart:()=>initialElection,getFiscalScore:fiscalScoreFromDistance,getPhase:()=>phase,prepare:prepareGame,begin:beginGame,getPreviewRemainingMs:()=>Math.max(0,previewDeadline-Date.now()),getPreviewDurationMs:()=>previewDurationMs,getEventsTXT:()=>buildEventsTXT(),getResultsOpen:()=>!$('resultsOverlay').hidden,getToastData:()=>[...$('newsToasts').children].map(e=>({month:e.dataset.month,kind:e.dataset.kind,title:e.querySelector('h3').textContent}))};
+})();
+</script>
+</body></html>
